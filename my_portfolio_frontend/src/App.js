@@ -7,7 +7,6 @@ import { GraduationCap, Award, User, Mail, Terminal, ShieldCheck, Database, Cpu,
 // --- Professional Academic Card Component ---
 const AcademicCard = ({ year, degree, university, description, subjects, icon: Icon, color }) => (
   <div className="relative pl-10 pb-12 border-l-2 border-slate-800 last:pb-0">
-    {/* The Timeline Connector */}
     <div className={`absolute -left-[17px] top-0 p-2.5 rounded-full border-4 border-slate-900 shadow-xl ${color} text-white z-10`}>
       <Icon size={14} />
     </div>
@@ -53,26 +52,33 @@ function App() {
   const [projects, setProjects] = useState([]);
   const [certificates, setCertificates] = useState([]);
 
+  // 🔥 ඔයාගේ Backend එකේ Vercel ලින්ක් එක (eyeyeye.png එකේ තිබ්බ එක)
+  const API_URL = "https://myprotfolio-7hdr-5qodr0zgu-warunadesilvas-projects.vercel.app";
+
   useEffect(() => {
-    axios.get('http://localhost:5000/get-projects')
+    // Backend එකෙන් Projects ලබා ගැනීම
+    axios.get(`${API_URL}/get-projects`)
       .then(res => setProjects(res.data))
       .catch(err => console.error("Error fetching projects:", err));
 
-    axios.get('http://localhost:5000/get-certificates')
+    // Backend එකෙන් Certificates ලබා ගැනීම
+    axios.get(`${API_URL}/get-certificates`)
       .then(res => setCertificates(res.data))
       .catch(err => console.error("Error fetching certificates:", err));
-  }, []);
+  }, [API_URL]);
 
   const handleContact = async (e) => {
     e.preventDefault();
     setStatus('Sending...');
     try {
-      const res = await axios.post('http://localhost:5000/contact', formData);
+      // Contact form එක Backend එකට යැවීම
+      const res = await axios.post(`${API_URL}/contact`, formData);
       if (res.data.success) {
         setStatus('Message Sent Successfully! ✅');
         setFormData({ name: '', email: '', message: '' });
       }
     } catch (error) {
+      console.error("Contact form error:", error);
       setStatus('Failed to send message. ❌');
     }
   };
@@ -121,7 +127,7 @@ function App() {
           <div className="bg-slate-800/20 p-8 md:p-10 rounded-3xl border border-slate-700/30 backdrop-blur-sm">
             <div className="text-slate-300 text-lg leading-relaxed space-y-6">
               <p className="text-justify antialiased tracking-wide">
-                Hi ,I am a <strong>Software Engineering undergraduate</strong> at the Open University of Sri Lanka, uniquely backed by a strong <strong>BSc in Statistics and Mathematics</strong> from the University of Ruhuna. My expertise lies at the intersection of robust software development and advanced data science, with a core focus on <strong>Machine Learning and Predictive Modeling</strong>.
+                Hi, I am a <strong>Software Engineering undergraduate</strong> at the Open University of Sri Lanka, uniquely backed by a strong <strong>BSc in Statistics and Mathematics</strong> from the University of Ruhuna. My expertise lies at the intersection of robust software development and advanced data science, with a core focus on <strong>Machine Learning and Predictive Modeling</strong>.
               </p>
               <p className="text-justify antialiased tracking-wide">
                 I specialize in bridging the gap between complex mathematical theory and scalable software solutions. From building <strong>AI-powered environmental monitoring systems</strong> to developing high-performance web applications, I leverage my analytical mindset and engineering skills to solve real-world problems. I am deeply passionate about <strong>AI, Data Analytics</strong>, and creating user-centric software that drives innovation.

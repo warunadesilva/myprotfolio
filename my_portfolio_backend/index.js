@@ -1,52 +1,45 @@
+
 const express = require('express');
 const admin = require('firebase-admin');
 const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
-app.use(cors());
+
+// 🔥 CORS Configuration - vhjd.png එකේ තිබුණු Frontend URL එකට අවසර දීම
+app.use(cors({
+    origin: "https://myprotfolio-six-pied.vercel.app", // ඔයාගේ නිවැරදි Frontend URL එක මෙතන තියෙන්න ඕනේ
+    methods: ["GET", "POST"],
+    credentials: true
+}));
+
 app.use(express.json());
 
 const PORT = process.env.PORT || 5000;
 
-// 🔥 Firebase Initialization (JSON ෆයිල් එක වෙනුවට Env Variables පාවිච්චි කරයි)
+// 🔥 Firebase Initialization
 try {
     if (!admin.apps.length) {
         admin.initializeApp({
             credential: admin.credential.cert({
                 projectId: process.env.FIREBASE_PROJECT_ID,
                 clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-                // Private Key එකේ තියෙන \n අකුරු ටික හරියට පේළි වලට කඩන්න මේ replace එක අනිවාර්යයි
                 privateKey: process.env.FIREBASE_PRIVATE_KEY ? process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n') : undefined,
             }),
             databaseURL: process.env.FIREBASE_DATABASE_URL
         });
     }
-    console.log(`-----------------------------------------`);
     console.log(`🔥 Firebase Firestore is Connected!`);
-    console.log(`-----------------------------------------`);
 } catch (error) {
     console.error("❌ Firebase Initialization Error:", error.message);
 }
 
 const db = admin.firestore();
 
-// --- 0. ROOT ROUTE (වැඩේ ගොඩද කියලා චෙක් කරන්න ලේසියි) ---
-app.get('/', (req, res) => {
-    res.json({ 
-        message: "Portfolio Backend is running successfully!",
-        status: "Connected to Firebase"
-    });
-});
+// --- ROUTES ---
 
-// --- 1. PROJECTS ROUTES ---
-app.post('/add-project', async (req, res) => {
-    try {
-        const { title, description, techStack, link } = req.body;
-        const newProject = { title, description, techStack, link, createdAt: new Date() };
-        const docRef = await db.collection('projects').add(newProject);
-        res.status(201).json({ success: true, message: "Project added!", id: docRef.id });
-    } catch (error) { res.status(500).json({ error: error.message }); }
+app.get('/', (req, res) => {
+    res.json({ message: "Portfolio Backend is running successfully!", status: "Connected" });
 });
 
 app.get('/get-projects', async (req, res) => {
@@ -54,16 +47,6 @@ app.get('/get-projects', async (req, res) => {
         const snapshot = await db.collection('projects').orderBy('createdAt', 'desc').get();
         const projects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         res.json(projects);
-    } catch (error) { res.status(500).json({ error: error.message }); }
-});
-
-// --- 2. CERTIFICATES ROUTES ---
-app.post('/add-certificate', async (req, res) => {
-    try {
-        const { title, issuedBy, category, color } = req.body;
-        const newCert = { title, issuedBy, category, color, createdAt: new Date() };
-        const docRef = await db.collection('certificates').add(newCert);
-        res.status(201).json({ success: true, message: "Certificate added!", id: docRef.id });
     } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
@@ -75,7 +58,6 @@ app.get('/get-certificates', async (req, res) => {
     } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// --- 3. CONTACT FORM ROUTE ---
 app.post('/contact', async (req, res) => {
     try {
         const { name, email, message } = req.body;

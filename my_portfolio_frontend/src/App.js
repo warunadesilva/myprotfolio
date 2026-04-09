@@ -53,7 +53,7 @@ function App() {
   const [certificates, setCertificates] = useState([]);
 
   // 🔥 ඔයාගේ Backend එකේ Vercel ලින්ක් එක (eyeyeye.png එකේ තිබ්බ එක)
-  const API_URL = "https://myprotfolio-7hdr-5qodr0zgu-warunadesilvas-projects.vercel.app";
+  const API_URL = "https://myprotfolio-7hdr.vercel.app/";
 
   useEffect(() => {
     // Backend එකෙන් Projects ලබා ගැනීම

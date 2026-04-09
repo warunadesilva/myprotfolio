@@ -1,0 +1,12 @@
+# Dependency folders
+node_modules/
+
+# Environment variables (අර පරණ MongoDB ලින්ක් එක තිබ්බ ෆයිල් එක)
+.env
+
+# Firebase Private Key (මේක තමයි වැදගත්ම එක - කාටවත් දෙන්න එපා)
+serviceAccountKey.json
+
+# OS generated files
+.DS_Store
+Thumbs.db

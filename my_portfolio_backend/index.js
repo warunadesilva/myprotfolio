@@ -3,18 +3,25 @@ const admin = require('firebase-admin');
 const cors = require('cors');
 require('dotenv').config();
 
-const serviceAccount = require("./serviceAccountKey.json");
-
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 const PORT = process.env.PORT || 5000;
 
+// 🔥 Firebase Initialization (JSON ෆයිල් එක වෙනුවට Env Variables පාවිච්චි කරමු)
 try {
-    admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount)
-    });
+    if (!admin.apps.length) {
+        admin.initializeApp({
+            credential: admin.credential.cert({
+                projectId: process.env.FIREBASE_PROJECT_ID,
+                clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+                // Private Key එකේ තියෙන \n අකුරු ටික හරියට පේළි වලට කඩන්න මේ replace එක අනිවාර්යයි
+                privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+            }),
+            databaseURL: process.env.FIREBASE_DATABASE_URL
+        });
+    }
     console.log(`-----------------------------------------`);
     console.log(`🔥 Firebase Firestore is Connected!`);
     console.log(`-----------------------------------------`);
@@ -23,6 +30,11 @@ try {
 }
 
 const db = admin.firestore();
+
+// --- 0. ROOT ROUTE (Vercel එකට වැඩේ ගොඩද කියලා බලන්න) ---
+app.get('/', (req, res) => {
+    res.json({ message: "Portfolio Backend is running successfully!" });
+});
 
 // --- 1. PROJECTS ROUTES ---
 app.post('/add-project', async (req, res) => {
@@ -42,7 +54,7 @@ app.get('/get-projects', async (req, res) => {
     } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// --- 2. CERTIFICATES ROUTES (මේක තමයි උඹට අඩු වෙලා තිබ්බේ) ---
+// --- 2. CERTIFICATES ROUTES ---
 app.post('/add-certificate', async (req, res) => {
     try {
         const { title, issuedBy, category, color } = req.body;

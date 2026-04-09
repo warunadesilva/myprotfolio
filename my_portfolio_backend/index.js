@@ -9,7 +9,7 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 5000;
 
-// 🔥 Firebase Initialization (JSON ෆයිල් එක වෙනුවට Env Variables පාවිච්චි කරමු)
+// 🔥 Firebase Initialization (JSON ෆයිල් එක වෙනුවට Env Variables පාවිච්චි කරයි)
 try {
     if (!admin.apps.length) {
         admin.initializeApp({
@@ -17,7 +17,7 @@ try {
                 projectId: process.env.FIREBASE_PROJECT_ID,
                 clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
                 // Private Key එකේ තියෙන \n අකුරු ටික හරියට පේළි වලට කඩන්න මේ replace එක අනිවාර්යයි
-                privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+                privateKey: process.env.FIREBASE_PRIVATE_KEY ? process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n') : undefined,
             }),
             databaseURL: process.env.FIREBASE_DATABASE_URL
         });
@@ -31,9 +31,12 @@ try {
 
 const db = admin.firestore();
 
-// --- 0. ROOT ROUTE (Vercel එකට වැඩේ ගොඩද කියලා බලන්න) ---
+// --- 0. ROOT ROUTE (වැඩේ ගොඩද කියලා චෙක් කරන්න ලේසියි) ---
 app.get('/', (req, res) => {
-    res.json({ message: "Portfolio Backend is running successfully!" });
+    res.json({ 
+        message: "Portfolio Backend is running successfully!",
+        status: "Connected to Firebase"
+    });
 });
 
 // --- 1. PROJECTS ROUTES ---
@@ -82,5 +85,5 @@ app.post('/contact', async (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`🚀 Server is running on http://localhost:${PORT}`);
+    console.log(`🚀 Server is running on port ${PORT}`);
 });
